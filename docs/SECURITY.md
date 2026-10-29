@@ -8,3 +8,7 @@
 - Restrict uploads and scan/validate file types before enabling future file tools.
 - If a bot token leaks, rotate it through BotFather immediately and invalidate any affected sessions.
 - Do not log the raw `initData`, Bot Token, or private user files.
+
+- For the temporary Telegram test, expose **only** FastAPI serving the built Mini App, not `npm run dev` or the Vite HMR server.
+- A Cloudflare Quick Tunnel is a temporary **public** URL; anyone with it can access the published front page and public API endpoints. Do not send its URL to strangers.
+- Local tunnels close when stopped and URL changes when restarted. They are not production hosting.

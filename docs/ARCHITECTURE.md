@@ -9,3 +9,9 @@
 - `infrastructure/`: reserved for later deployment.
 
 Plan: modular monolith, background workers for heavy jobs, then PostgreSQL and Redis when warranted. No real API user sessions exist yet. Avoid adding private endpoints until sessions and ownership checks exist.
+
+## Single-origin Mini App test
+
+For Telegram use, build `miniapp/dist` then restart the FastAPI server. FastAPI serves the compiled static site and login API from the same origin; this avoids localhost calls from a phone and avoids exposing Vite's dev server. During local UI development Vite proxies `/api` to 127.0.0.1:8000.
+
+Follow `docs/TELEGRAM_MINIAPP_TEST.md` for a temporary HTTPS tunnel.

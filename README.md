@@ -62,8 +62,14 @@ cd ../miniapp
 npm run build
 ```
 
+## Open the Mini App **inside Telegram** (temporary preview)
+
+See **[Telegram Mini App quick-test steps](docs/TELEGRAM_MINIAPP_TEST.md)**.
+
+The Mini App and API are served together from FastAPI after `npm run build`. Cloudflare Quick Tunnel can temporarily expose your local API via HTTPS for testing from a phone. This does **not** provide always-on hosting.
+
 ## Security and deployment
-- A real Mini App inside Telegram requires a **public HTTPS** URL; local development runs as a preview in the browser.
+- A real Mini App inside Telegram requires a **public HTTPS** URL. Use the temporary tunnel procedure for testing; permanent hosting comes later.
 - `initDataUnsafe` may supply UI hints but NEVER grants access. Server verifies `initData`.
 - No persistent authenticated API session exists in v0.1. Add secure sessions before private endpoints.
 - Keep secrets off GitHub, even if repository is private.

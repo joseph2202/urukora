@@ -2,9 +2,10 @@
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from .config import settings
+from .config import ROOT, settings
 from .db import initialize_db, save_signed_user
 from .telegram_auth import TelegramAuthError, verify_init_data
 
@@ -52,3 +53,17 @@ async def telegram_login(payload: TelegramLoginRequest) -> dict:
             "language_code": user.get("language_code", ""),
         },
     }
+
+
+# Serve the compiled Mini App on the same host as our verified login API.
+# Build the frontend first: cd miniapp && npm run build; then start/restart FastAPI.
+# Never expose Vite's development server publicly.
+miniapp_dist = ROOT / "miniapp" / "dist"
+if miniapp_dist.is_dir():
+    app.mount("/", StaticFiles(directory=str(miniapp_dist), html=True), name="miniapp")
+else:
+    @app.get("/")
+    async def miniapp_not_built() -> dict:
+        return {
+            "message": "Mini App not built. Run 'npm run build' in miniapp/ and restart the API."
+        }
