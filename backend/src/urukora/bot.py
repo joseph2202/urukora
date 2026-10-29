@@ -39,9 +39,9 @@ async def start(message: Message) -> None:
     if message.chat.type != "private":
         await message.answer(
             greeting + (
-                "\\n\\nافتح المحادثة الخاصة بالبوت حتى تستخدم التطبيق."
+                "\n\nافتح المحادثة الخاصة بالبوت حتى تستخدم التطبيق."
                 if is_ar else
-                "\\n\\nOpen the bot's private chat to launch the Mini App."
+                "\n\nOpen the bot's private chat to launch the Mini App."
             )
         )
         return
