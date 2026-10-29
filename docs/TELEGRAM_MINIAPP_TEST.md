@@ -65,7 +65,7 @@ source .venv/bin/activate
 python -m urukora.bot
 ```
 
-Open your bot's private chat in Telegram and send `/start` again. The **Open URUKORA** reply-keyboard button should appear. Tap it to open the Mini App.
+Open your bot's **private chat** in Telegram and send `/start` again. Use the **new Open URUKORA inline button below the latest bot message**. Do not use the older reply-keyboard button lingering above your chat input: that launch mode does not provide signed Telegram initData. The old button may remain visible until Telegram hides the previous reply keyboard, but only the new inline button should be used for sign-in.
 
 Expected: app starts inside Telegram, and a successful verified sign-in indicator appears. If you open the same URL in Safari/Chrome, the page remains in preview mode because a browser does not have Telegram-signed `initData`.
 
@@ -74,7 +74,7 @@ Expected: app starts inside Telegram, and a successful verified sign-in indicato
 - No button: confirm `WEBAPP_URL` starts with `https://`, and restart the bot after saving `.env`.
 - Page not loading: API and tunnel must both be running; test local 8000 URL first.
 - Old interface: rerun `npm run build` and restart API.
-- Auth error: confirm the bot and API use the same `BOT_TOKEN` in the local root `.env` and the URL was opened via the bot's **web app button**. Verify the tunnel routes to port 8000, not 5173.
+- Local preview mode **inside Telegram**: you likely tapped an old **reply-keyboard** button. Send `/start` again and use the **inline button below the new message**. Telegram does not supply signed `initData` to Mini Apps opened from reply-keyboard buttons.\n- Auth error: confirm the bot and API use the same `BOT_TOKEN` in the local root `.env` and the URL was opened via the bot's **new inline web app button**. Verify the tunnel routes to port 8000, not 5173.
 - Tunnel URL changes: update `WEBAPP_URL` and restart the bot, then send a fresh `/start`.
 - Stop all three terminals to end the temporary test. No server continues running when your Mac sleeps.
 

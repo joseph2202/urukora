@@ -4,7 +4,7 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
-from aiogram.types import KeyboardButton, Message, ReplyKeyboardMarkup, WebAppInfo
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, WebAppInfo
 from .config import settings
 
 logger = logging.getLogger(__name__)
@@ -33,12 +33,24 @@ async def start(message: Message) -> None:
         await message.answer(greeting)
         return
 
-    keyboard = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(
+    # Telegram does not supply signed initData to Mini Apps opened via a
+    # ReplyKeyboardMarkup web_app button. Use an inline web_app button instead.
+    # Telegram only supports inline web_app buttons in private bot chats.
+    if message.chat.type != "private":
+        await message.answer(
+            greeting + (
+                "\\n\\nافتح المحادثة الخاصة بالبوت حتى تستخدم التطبيق."
+                if is_ar else
+                "\\n\\nOpen the bot's private chat to launch the Mini App."
+            )
+        )
+        return
+
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[[InlineKeyboardButton(
             text="🚀 افتح أوروكورا / Open URUKORA" if is_ar else "🚀 Open URUKORA",
             web_app=WebAppInfo(url=settings.webapp_url),
         )]],
-        resize_keyboard=True,
     )
     await message.answer(greeting, reply_markup=keyboard)
 

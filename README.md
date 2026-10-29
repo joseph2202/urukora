@@ -6,7 +6,7 @@ Bilingual (Arabic/English) Telegram bot and Mini App foundation. Version **0.1**
 
 ## Available now
 - Telegram `/start` reply in Arabic or English.
-- Web App button when an HTTPS `WEBAPP_URL` is configured.
+- Inline Web App button (private chat) when an HTTPS `WEBAPP_URL` is configured. Unlike reply-keyboard buttons, this launch mode provides signed Telegram Mini App initData.
 - React + TypeScript Mini App, Arabic RTL / English LTR switching.
 - Local QR code generation in the browser, no QR contents sent to our API.
 - FastAPI health endpoint `GET /api/v1/health`.
