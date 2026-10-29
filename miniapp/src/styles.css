@@ -9,3 +9,30 @@ h2{font-size:16px;margin:0 0 14px}h1.section-title{font-size:25px;margin:8px 0 2
 .muted{margin-top:15px}.empty{border:1px dashed #46556c;border-radius:18px;min-height:210px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#d2b07e;font-size:40px}.empty p{color:#adbdd2;max-width:275px;text-align:center;line-height:1.7;font-size:13px;margin:0 20px}.switch-row{display:flex;gap:10px}.switch-row button{flex:1;background:#273b4a;border:1px solid #3a515d;color:#d4e1e7;border-radius:11px;padding:10px}.switch-row button.chosen{border-color:#62c8bd;background:#235052;color:#fff}.privacy{color:#a9bbc9;font-size:12px;line-height:1.8;margin:18px 4px}
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:580px;background:#111e2df5;border-top:1px solid #29394a;display:flex;justify-content:space-around;padding:11px 10px max(11px,env(safe-area-inset-bottom));backdrop-filter:blur(10px);z-index:5}.bottom-nav button{background:none;border:0;color:#8fa6b9;display:grid;gap:4px;justify-items:center;min-width:64px}.bottom-nav button.active{color:#73d9ce}.bottom-nav button span{font-size:25px;line-height:26px}.bottom-nav button small{font-size:11px}
 @media (min-width:580px){.bottom-nav{border-radius:14px 14px 0 0}}@media (prefers-reduced-motion:no-preference){button{transition:opacity .2s,transform .2s}button:hover:not(:disabled){opacity:.9}}
+
+/* v0.2 local file studio */
+.studio-card{background:#182839;border:1px solid #2b4552;border-radius:19px;padding:19px;margin:0 0 18px}
+.studio-intro{display:flex;align-items:center;gap:12px;margin:0 0 19px}
+.studio-intro h2{margin:0 0 5px;font-size:18px}.studio-intro p{color:#a5baca;font-size:12px;line-height:1.7;margin:0}
+.studio-emblem{display:grid;place-items:center;font-size:27px;color:#78d7cd;background:#25454a;border-radius:12px;width:49px;min-width:49px;height:49px}
+.studio-toggle,.tool-selector{display:flex;gap:8px;padding:5px;margin:0 0 18px;background:#101b2c;border-radius:12px}
+.studio-toggle button,.tool-selector button{flex:1;min-width:0;padding:10px 5px;background:transparent;border:1px solid transparent;border-radius:9px;color:#a8c0d1;font-size:12px;font-weight:650}
+.studio-toggle button.selected,.tool-selector button.active{background:#244349;border-color:#467a79;color:#9be8dd}
+.studio-label{display:block;color:#d8e6ee;font-size:13px;font-weight:600;margin:13px 0 8px;line-height:1.7}
+.studio-input,.studio-text-input,.studio-label select{width:100%;background:#0e1d2d;border:1px solid #456071;border-radius:11px;color:#f4f6f9;padding:12px;min-width:0}
+.studio-input{font-size:12px;line-height:1.5}.studio-text-input{font-size:15px;text-align:left}
+.studio-input::file-selector-button{border:0;border-radius:7px;background:#375d66;color:#fff;padding:8px;margin-inline-end:9px}
+.studio-file-list{background:#101f30;border:1px solid #2f4657;border-radius:11px;padding:11px;margin-top:12px;overflow-wrap:anywhere;font-size:12px;line-height:1.6}
+.studio-file-list ol{padding-inline-start:21px;margin:8px 0 0}.studio-file-list li{margin:5px 0}.studio-file-list span{color:#9eb6c7}
+.studio-hint{font-size:12px;color:#9bb3c4;line-height:1.7;margin:10px 0}
+.studio-submit{width:100%;margin-top:11px}.studio-submit:disabled{opacity:.48;cursor:not-allowed}
+.studio-error{color:#ffaaaa;font-size:12px;line-height:1.7;margin-top:12px}
+.studio-success{display:grid;gap:8px;padding:14px;margin-top:14px;border-radius:12px;background:#153c36;border:1px solid #276a60;color:#a3f1dc;font-size:13px}
+.studio-success span{color:#cee2da}.studio-download{justify-self:start;border:1px solid #6bc8bc;background:transparent;border-radius:9px;padding:8px 14px;color:#a3f1dc;font-size:12px;font-weight:700}
+.studio-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.studio-label select{display:block;margin-top:8px;font-weight:400}
+.studio-range{display:block;width:100%;accent-color:#48bcb3}
+.activity-item{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#192738;border:1px solid #29394d;border-radius:12px;padding:14px;margin-bottom:9px}
+.activity-item strong{font-size:13px}.activity-item small{color:#9bb3c4;font-size:11px}.activity-item span{color:#83d6cd;font-size:12px;white-space:nowrap}
+.activity-clear{border:1px solid #536475;border-radius:9px;background:transparent;color:#b7c5d2;padding:9px 12px;margin-bottom:14px}
+@media(max-width:350px){.studio-fields{grid-template-columns:1fr}.tool-selector button{font-size:11px}}

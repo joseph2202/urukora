@@ -22,4 +22,6 @@ jobs:
       - working-directory: miniapp
         run: npm install --no-audit --no-fund
       - working-directory: miniapp
+        run: npm run test
+      - working-directory: miniapp
         run: npm run build
