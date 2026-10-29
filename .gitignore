@@ -1,0 +1,26 @@
+# Never commit credentials, tokens or local environment files
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.egg-info/
+.ruff_cache/
+.pyright/
+*.db
+*.db-*
+*.sqlite3
+backend/data/
+backend/uploads/
+backend/tmp/
+node_modules/
+dist/
+.vite/
+.DS_Store
+.idea/
+.vscode/settings.json
