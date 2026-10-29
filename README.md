@@ -2,18 +2,23 @@
 
 **Ancient roots. Infinite possibilities. — جذور عريقة. إمكانيات بلا حدود.**
 
-Bilingual (Arabic/English) Telegram bot and Mini App foundation. Version **0.1** is a development starter, **not a deployed production bot**.
+Bilingual (Arabic/English) Telegram bot and Mini App foundation. Version **0.2** is a developer preview, **not a deployed production bot**.
 
 ## Available now
 - Telegram `/start` reply in Arabic or English.
 - Inline Web App button (private chat) when an HTTPS `WEBAPP_URL` is configured. Unlike reply-keyboard buttons, this launch mode provides signed Telegram Mini App initData.
 - React + TypeScript Mini App, Arabic RTL / English LTR switching.
 - Local QR code generation in the browser, no QR contents sent to our API.
+- **PDF Studio** — merge 2–5 PDFs in order or extract pages using ranges such as `1-3,5`; browser-only.
+- **Image Studio** — convert JPG/PNG/WebP, resize longest edge and adjust output quality; browser-only.
+- **Activity** — local operation history with timestamps and output sizes, never file contents or original names.
+- Client-side safety limits: 12MB/file, 36MB total PDFs, 200 resulting PDF pages, 24MP image input.
+- Bilingual labels (Arabic + English), RTL support.
 - FastAPI health endpoint `GET /api/v1/health`.
 - Verified Telegram Mini App `initData` login (signature and freshness).
 - SQLite verified-user storage; backend regression tests and GitHub CI.
 
-**Not implemented yet:** file/PDF conversion, reminders, channels, AI, payments, dashboard, production sessions, PostgreSQL and deployment.
+**Not implemented yet:** image-to-PDF, PDF OCR, Office conversion, password-encrypted PDFs, large/batch background jobs, server-side file history, reminders, channels, AI, payments, dashboard, production sessions, PostgreSQL and deployment.
 
 ## Run on your Mac
 
@@ -59,6 +64,7 @@ Open http://127.0.0.1:5173. Preview mode supports changing language and generati
 cd backend
 python -m pytest -q
 cd ../miniapp
+npm run test
 npm run build
 ```
 
@@ -76,3 +82,11 @@ The Mini App and API are served together from FastAPI after `npm run build`. Clo
 - The public repository holds code and examples only; local database and `.env` are ignored.
 
 See `docs/ARCHITECTURE.md`, `docs/SECURITY.md` and `docs/ROADMAP.md`.
+
+## v0.2 File Studio notes
+
+No `BOT_TOKEN` or deployment configuration changes are needed. After pulling changes and running `cd miniapp && npm install && npm run build`, restart the API so it serves the newly built site. Your existing Cloudflare tunnel still points to port 8000 while the Mac is on.
+
+PDFs and images are processed in the **browser's memory** and immediately offered for download; files are not uploaded or stored on the backend. Local activity records include only operation type, timestamp, and output size, and can be cleared in the Activity tab. Very large, scanned, damaged, or encrypted PDFs may not work in mobile WebViews. PDF text recognition (OCR) is not available.
+
+`npm run test` executes frontend unit tests. See `docs/FILE_STUDIO.md` for supported formats and limitations.

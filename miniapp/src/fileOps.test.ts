@@ -37,10 +37,11 @@ describe('client-only file validation', () => {
   it('applies PDF byte limits', () => {
     const big = { name: 'big.pdf', type: 'application/pdf', size: PDF_MAX_FILE_BYTES + 1 } as File;
     expect(() => validatePdfFiles([big], 'extract')).toThrow();
-    const two = [18, 20].map((mb, i) => ({
-      name: `x${i}.pdf`, type: 'application/pdf', size: mb * 1024 * 1024,
+    const four = Array.from({ length: 4 }, (_, i) => ({
+      name: `x${i}.pdf`, type: 'application/pdf', size: PDF_MAX_FILE_BYTES,
     } as File));
-    expect(two.reduce((s, x) => s + x.size, 0)).toBeGreaterThan(PDF_MAX_TOTAL_BYTES);
+    expect(four.reduce((s, x) => s + x.size, 0)).toBeGreaterThan(PDF_MAX_TOTAL_BYTES);
+    expect(() => validatePdfFiles(four, 'merge')).toThrow();
   });
   it('restricts images to known types', () => {
     expect(() => validateImage(file('a.png', 'image/png'))).not.toThrow();
