@@ -171,7 +171,7 @@ def claim_due(*, now: int | None = None, limit: int = 10) -> list[Reminder]:
                         lease_token = ?, attempts = attempts + 1
                     WHERE id = ?
                 """, (timestamp + LEASE_SECONDS, token, row[0]))
-                claimed.append(Reminder(*row, lease_token=token, attempts=row[6] + 1))
+                claimed.append(Reminder(*row[:6], attempts=row[6] + 1, lease_token=token))
             db.commit()
         except Exception:
             db.rollback()
