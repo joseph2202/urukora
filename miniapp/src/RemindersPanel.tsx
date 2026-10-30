@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 
 type Lang = 'ar' | 'en';
 type Unit = 'm' | 'h' | 'd';
@@ -133,7 +133,7 @@ export default function RemindersPanel({ lang, initData, verified }: Props) {
     return () => { active = false; };
   }, [verified, initData, lang]);
 
-  async function save(event: React.FormEvent<HTMLFormElement>) {
+  async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (requestInFlight.current || !verified || !initData) return;
     const amount = Number(quantity);
