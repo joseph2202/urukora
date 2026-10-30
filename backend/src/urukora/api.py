@@ -7,6 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from .config import ROOT, settings
 from .db import initialize_db, save_signed_user
+from .reminders import init_reminders
+from .reminder_api import router as reminder_api_router
 from .telegram_auth import TelegramAuthError, verify_init_data
 
 
@@ -17,10 +19,12 @@ class TelegramLoginRequest(BaseModel):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     initialize_db()
+    init_reminders()
     yield
 
 
-app = FastAPI(title="URUKORA API", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="URUKORA API", version="0.4.0", lifespan=lifespan)
+app.include_router(reminder_api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[settings.frontend_origin.rstrip("/")],
@@ -32,7 +36,7 @@ app.add_middleware(
 
 @app.get("/api/v1/health")
 async def health() -> dict:
-    return {"status": "ok", "service": "urukora-api", "version": "0.1.0"}
+    return {"status": "ok", "service": "urukora-api", "version": "0.4.0"}
 
 
 @app.post("/api/v1/auth/telegram")

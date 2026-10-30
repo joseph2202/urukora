@@ -67,8 +67,18 @@ def init_reminders() -> None:
                     status TEXT NOT NULL DEFAULT 'pending',
                     attempts INTEGER NOT NULL DEFAULT 0,
                     lease_until INTEGER NOT NULL DEFAULT 0,
-                    lease_token TEXT NOT NULL DEFAULT ''
+                    lease_token TEXT NOT NULL DEFAULT '',
+                    request_key TEXT
                 )
+            """)
+            # Additive schema upgrade for existing v0.3 SQLite databases.
+            columns = {row[1] for row in db.execute("PRAGMA table_info(reminders)")}
+            if "request_key" not in columns:
+                db.execute("ALTER TABLE reminders ADD COLUMN request_key TEXT")
+            db.execute("""
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_reminders_idempotency
+                ON reminders(user_id, request_key)
+                WHERE request_key IS NOT NULL
             """)
             db.execute("""
                 CREATE INDEX IF NOT EXISTS idx_reminders_queue
@@ -87,6 +97,7 @@ def create_reminder(
     delay_seconds: int,
     lang: str = "en",
     *,
+    request_key: str | None = None,
     now: int | None = None,
 ) -> Reminder:
     if type(user_id) is not int or user_id <= 0 or chat_id != user_id:
@@ -95,6 +106,8 @@ def create_reminder(
         raise ReminderError("Enter a message of up to 280 characters.")
     if type(delay_seconds) is not int or not 60 <= delay_seconds <= MAX_DELAY_SECONDS:
         raise ReminderError("Duration must be 1 minute to 30 days.")
+    if request_key is not None and not re.fullmatch(r"[a-f0-9]{32}", request_key):
+        raise ReminderError("Invalid request key.")
     timestamp = int(time.time()) if now is None else now
     due_at = timestamp + delay_seconds
     language = "ar" if lang == "ar" else "en"
@@ -102,6 +115,19 @@ def create_reminder(
         # A write lock enforces quotas even if two requests arrive concurrently.
         db.execute("BEGIN IMMEDIATE")
         try:
+            if request_key is not None:
+                existing = db.execute("""
+                    SELECT id, user_id, chat_id, message, lang, due_at, attempts,
+                           (due_at - created_at) AS delay
+                    FROM reminders
+                    WHERE user_id = ? AND request_key = ?
+                """, (user_id, request_key)).fetchone()
+                if existing:
+                    if (existing[3] != message.strip() or existing[4] != language
+                            or existing[7] != delay_seconds):
+                        raise ReminderError("Request key already used for a different reminder.")
+                    db.commit()
+                    return Reminder(*existing[:7])
             active = db.execute("""
                 SELECT COUNT(*) FROM reminders
                 WHERE user_id = ? AND status IN ('pending','leased')
@@ -111,9 +137,9 @@ def create_reminder(
             cur = db.execute("""
                 INSERT INTO reminders (
                     user_id, chat_id, message, lang, created_at,
-                    due_at, not_before
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (user_id, chat_id, message.strip(), language, timestamp, due_at, due_at))
+                    due_at, not_before, request_key
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (user_id, chat_id, message.strip(), language, timestamp, due_at, due_at, request_key))
             db.commit()
         except Exception:
             db.rollback()
