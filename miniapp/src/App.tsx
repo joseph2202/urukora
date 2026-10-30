@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import FileStudio, { type FileActivity } from './FileStudio';
 import { formatBytes } from './fileOps';
+import RemindersPanel from './RemindersPanel';
 
 type Lang = 'ar' | 'en';
 type Tab = 'home' | 'tools' | 'activity' | 'settings' | 'reminders';
@@ -17,7 +18,7 @@ const translations = {
     settings: 'الإعدادات', qr: 'إنشاء QR', qrDesc: 'حوّل أي نص أو رابط إلى رمز QR.',
     pdf: 'استوديو PDF', pdfDesc: 'دمج الملفات واستخراج صفحاتها على جهازك.',
     images: 'استوديو الصور', imageDesc: 'تحويل الصور وتغيير حجمها وضغطها.',
-    reminders: 'التذكيرات', remindersDesc: 'سجّل تذكيراتك من محادثة البوت.',
+    reminders: 'التذكيرات', remindersDesc: 'أنشئ ونظّم تذكيراتك من داخل التطبيق.',
     reminderIntro: 'تگدر تنشئ وتلغي تذكيراتك من المحادثة الخاصة مع أوروكورا.',
     reminderExample: 'مثال لإنشاء تذكير بعد 10 دقائق:',
     reminderList: 'عرض التذكيرات المعلّقة:',
@@ -35,7 +36,7 @@ const translations = {
     mergeActivity: 'دمج PDF', extractActivity: 'استخراج صفحات PDF', imageActivity: 'تحويل صورة',
     language: 'لغة التطبيق',
     privacy: 'رمز QR والملفات تنعالج محلياً على جهازك. ما نرفع محتواها لخادمنا.',
-    v: 'نسخة تجريبية 0.2',
+    v: 'نسخة تجريبية 0.4',
   },
   en: {
     tagline: 'Ancient roots. Infinite possibilities.', welcome: 'Every tool. One workspace.',
@@ -44,7 +45,7 @@ const translations = {
     settings: 'Settings', qr: 'QR generator', qrDesc: 'Turn any text or URL into a QR code.',
     pdf: 'PDF Studio', pdfDesc: 'Merge PDFs or extract pages privately.',
     images: 'Image Studio', imageDesc: 'Resize and convert your images.',
-    reminders: 'Reminders', remindersDesc: 'Create reminders from the bot chat.',
+    reminders: 'Reminders', remindersDesc: 'Create and manage reminders inside the app.',
     reminderIntro: 'Create, list and cancel your reminders in URUKORA’s private bot chat.',
     reminderExample: 'Example: remind me in 10 minutes:',
     reminderList: 'Show pending reminders:',
@@ -62,7 +63,7 @@ const translations = {
     mergeActivity: 'Merged PDFs', extractActivity: 'Extracted PDF pages', imageActivity: 'Converted image',
     language: 'App language',
     privacy: 'QR codes and files are processed on this device. Their contents are not uploaded.',
-    v: 'Preview v0.2',
+    v: 'Preview v0.4',
   },
 };
 
@@ -172,7 +173,7 @@ export default function App() {
     <header className="header">
       <div className="mark" aria-hidden="true">U</div>
       <div className="brand"><strong>URUKORA</strong><span>أوروكورا</span></div>
-      <span className="header-meta">v0.2</span>
+      <span className="header-meta">v0.4</span>
     </header>
     <main>
       {auth === 'verified' && <div className="status success">● {t.verified}</div>}
@@ -214,17 +215,7 @@ export default function App() {
       </>}
       {tab === 'reminders' && <>
         <h1 className="section-title">{t.reminders}</h1>
-        <section className="tool-card">
-          <div className="tool-heading"><span className="service-icon">◷</span><div><h2>{t.reminders}</h2><p>{t.reminderIntro}</p></div></div>
-          <p className="studio-hint">{t.reminderExample}</p>
-          <pre className="reminder-code" dir="ltr">/remind 10m {lang === 'ar' ? 'اشتري خبز' : 'Buy groceries'}</pre>
-          <p className="studio-hint">{t.reminderList}</p>
-          <pre className="reminder-code" dir="ltr">/reminders</pre>
-          <p className="studio-hint">{t.reminderCancel}</p>
-          <pre className="reminder-code" dir="ltr">/cancel 12</pre>
-          <p className="studio-hint">/help • m / h / d</p>
-          <p className="privacy">{t.reminderNotice}</p>
-        </section>
+        <RemindersPanel lang={lang} initData={tg?.initData ?? ''} verified={auth === 'verified'} />
       </>}
       {tab === 'activity' && <>
         <h1 className="section-title">{t.activity}</h1>
