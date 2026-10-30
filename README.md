@@ -2,7 +2,7 @@
 
 **Ancient roots. Infinite possibilities. — جذور عريقة. إمكانيات بلا حدود.**
 
-Bilingual (Arabic/English) Telegram bot and Mini App foundation. Version **0.2** is a developer preview, **not a deployed production bot**.
+Bilingual (Arabic/English) Telegram bot and Mini App foundation. Version **0.3** is a developer preview, **not a deployed production bot**.
 
 ## Available now
 - Telegram `/start` reply in Arabic or English.
@@ -12,13 +12,14 @@ Bilingual (Arabic/English) Telegram bot and Mini App foundation. Version **0.2**
 - **PDF Studio** — merge 2–5 PDFs in order or extract pages using ranges such as `1-3,5`; browser-only.
 - **Image Studio** — convert JPG/PNG/WebP, resize longest edge and adjust output quality; browser-only.
 - **Activity** — local operation history with timestamps and output sizes, never file contents or original names.
+- **Telegram reminders** — private-chat `/remind`, `/reminders`, `/cancel`, `/help`; SQLite persistence, retry and ownership protections. The Mini App shows command instructions; it does not schedule directly.
 - Client-side safety limits: 12MB/file, 36MB total PDFs, 200 resulting PDF pages, 24MP image input.
 - Bilingual labels (Arabic + English), RTL support.
 - FastAPI health endpoint `GET /api/v1/health`.
 - Verified Telegram Mini App `initData` login (signature and freshness).
 - SQLite verified-user storage; backend regression tests and GitHub CI.
 
-**Not implemented yet:** image-to-PDF, PDF OCR, Office conversion, password-encrypted PDFs, large/batch background jobs, server-side file history, reminders, channels, AI, payments, dashboard, production sessions, PostgreSQL and deployment.
+**Not implemented yet:** image-to-PDF, PDF OCR, Office conversion, password-encrypted PDFs, large/batch background jobs, server-side file history, recurring reminders, channels, AI, payments, dashboard, production sessions, PostgreSQL and deployment.
 
 ## Run on your Mac
 
@@ -90,3 +91,38 @@ No `BOT_TOKEN` or deployment configuration changes are needed. After pulling cha
 PDFs and images are processed in the **browser's memory** and immediately offered for download; files are not uploaded or stored on the backend. Local activity records include only operation type, timestamp, and output size, and can be cleared in the Activity tab. Very large, scanned, damaged, or encrypted PDFs may not work in mobile WebViews. PDF text recognition (OCR) is not available.
 
 `npm run test` executes frontend unit tests. See `docs/FILE_STUDIO.md` for supported formats and limitations.
+
+## v0.3 Telegram reminders (bot commands)
+
+**Only in your bot's private chat**, send:
+
+```text
+/remind 10m Buy groceries
+/remind 2h Call a friend
+/remind 1d Review notes
+/reminders
+/cancel 12
+/help
+```
+
+Arabic works too: `/remind 10m اشتري خبز`.
+
+- One-off delays of 1 minute to 30 days. Unit `m` = minutes, `h` = hours, `d` = days.
+- Max **20 active reminders per user**, 280 characters per reminder.
+- Reminders are stored in **local SQLite**, not GitHub.
+- Owner-only listing and cancellation, using verified Telegram Bot API message identities.
+- Delivery worker checks roughly every 5 seconds while the **bot process is running**. If your Mac is off, reminders **do not fire**. Overdue reminders may arrive late when you restart the bot. Never rely on this development setup for important deadlines.
+- Failed deliveries retry with backoff up to 5 total attempts.
+- Rare duplicate notifications are possible after a process crash between Telegram accepting the message and the database recording success. Exactly-once delivery is not guaranteed.
+- Messages are stored in plaintext in the local SQLite database; keep the Mac and backups protected.
+- The Mini App does not have authenticated reminder CRUD endpoints yet; use Bot commands only.
+
+To test after downloading updates, start only the **bot process** if you don't need the Mini App:
+```bash
+cd ~/Documents/urukora
+git pull --ff-only
+cd backend
+source .venv/bin/activate
+python -m urukora.bot
+```
+See `docs/REMINDERS.md` for operational details.

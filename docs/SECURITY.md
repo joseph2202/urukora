@@ -20,3 +20,11 @@ PDF and image files are never sent to our HTTP API. They are read in the user's 
 Current limits: up to 12MB per file; 36MB across selected PDF files; no more than 5 PDFs and 200 output pages per operation; up to 24 million input pixels per image. File names and MIME types are not sufficient by themselves: PDFs also require their magic signature before parsing. This is resource protection, **not malware scanning**. Avoid claiming malicious PDFs are harmless; use untrusted file sandboxing and scanning before adding any future server-side processing.
 
 There is no multi-user persistent document storage or authenticated private file API in v0.2.
+
+## Reminders (v0.3)
+
+- Only authenticated Bot API private-chat messages create, list and cancel reminders; private chat ID must equal Telegram user ID. There are no unauthenticated Mini App reminder endpoints.
+- A user can cancel only their own pending reminder. Jobs already leased for send cannot be cancelled.
+- SQLite stores reminder text in plaintext locally; secure local disks, directory permissions and backups. Never commit a real SQLite database to GitHub.
+- Delivery uses bounded batches and atomic leases to avoid concurrent sends, with up to five retries. An unusual crash after Telegram accepts a message but before DB confirmation could trigger a duplicate later.
+- The bot must run continuously for on-time delivery. Without permanent hosting, delayed or missed notifications are possible.

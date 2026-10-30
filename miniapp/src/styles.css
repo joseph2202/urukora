@@ -36,3 +36,8 @@ h2{font-size:16px;margin:0 0 14px}h1.section-title{font-size:25px;margin:8px 0 2
 .activity-item strong{font-size:13px}.activity-item small{color:#9bb3c4;font-size:11px}.activity-item span{color:#83d6cd;font-size:12px;white-space:nowrap}
 .activity-clear{border:1px solid #536475;border-radius:9px;background:transparent;color:#b7c5d2;padding:9px 12px;margin-bottom:14px}
 @media(max-width:350px){.studio-fields{grid-template-columns:1fr}.tool-selector button{font-size:11px}}
+
+/* v0.3: readable Telegram reminder commands */
+.reminder-code{display:block;background:#0e1d2d;color:#98ecdb;border:1px solid #35566a;
+  border-radius:10px;padding:13px;font:500 13px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  white-space:pre-wrap;overflow-wrap:anywhere;text-align:left}
