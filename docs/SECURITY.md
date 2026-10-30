@@ -28,3 +28,13 @@ There is no multi-user persistent document storage or authenticated private file
 - SQLite stores reminder text in plaintext locally; secure local disks, directory permissions and backups. Never commit a real SQLite database to GitHub.
 - Delivery uses bounded batches and atomic leases to avoid concurrent sends, with up to five retries. An unusual crash after Telegram accepts a message but before DB confirmation could trigger a duplicate later.
 - The bot must run continuously for on-time delivery. Without permanent hosting, delayed or missed notifications are possible.
+
+## Mini App reminder access (v0.4)
+
+- Every `/api/v1/reminders/*` request must include **Telegram-signed initData** in the JSON body. Data are HMAC-validated against the server-only bot token and must be fresh (within one hour).
+- The Telegram user ID is derived only from the validated signed payload; caller-supplied IDs and client-side `initDataUnsafe` are never trusted.
+- The server enforces owner-only reads/deletes and 20 active reminders per user. Private chat ID equals the authenticated user's Telegram ID.
+- A random client-side request key ensures retried identical create calls don't insert duplicates; it is stored in SQLite with a per-user uniqueness index. This is not a substitute for HTTPS, anti-abuse controls or rate limits.
+- Logged-in status shown in UI is only informational. The server still verifies every reminder operation.
+- Close and reopen the Mini App after one hour to refresh Telegram launch credentials. Do not send `initData` via URL parameters or to third-party hosts.
+- Cloudflare Quick Tunnel publishes the app on a temporary public HTTPS address. Keep secrets off the frontend and do not deploy this development build to strangers.

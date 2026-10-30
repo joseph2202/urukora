@@ -45,3 +45,19 @@ python -m urukora.bot
 ```
 
 In the bot's private chat send `/remind 1m Test reminder`, check `/reminders`, and verify a message arrives while the bot keeps running. For the Mini App, separately build `miniapp/` and restart FastAPI.
+
+## Mini App v0.4 management
+
+The Reminders tile now provides a bilingual create/list/cancel UI. It calls these same-origin HTTPS endpoints:
+
+- `POST /api/v1/reminders/list` with `init_data`
+- `POST /api/v1/reminders/create` with `init_data`, `message`, `lang`, `delay_seconds`, and a 32-character hex `request_key`
+- `POST /api/v1/reminders/cancel` with `init_data` and `reminder_id`
+
+**All endpoints reverify** the Telegram Mini App HMAC signature and `auth_date`. The backend derives `user_id` from verified data, never from an untrusted request body. Login data expire after one hour; reopen the app to refresh. A normal browser preview is read-only for reminders.
+
+Database migrations are additive and run automatically when the API starts. The bot and API use the same SQLite file, so edits in the Mini App appear in `/reminders` and vice versa. The bot delivery loop is unchanged.
+
+Idempotency: the browser creates a secure random request key; reusing the key for identical content returns the original reminder and does not create another record. It is not a complete anti-replay or DDoS defense. Additional rate limiting and server-side sessions are needed before a production release.
+
+The reminders UI shows a local clock-time rendering of a relative delay, not a timezone-aware scheduling tool.

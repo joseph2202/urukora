@@ -2,7 +2,7 @@
 
 **Ancient roots. Infinite possibilities. — جذور عريقة. إمكانيات بلا حدود.**
 
-Bilingual (Arabic/English) Telegram bot and Mini App foundation. Version **0.3** is a developer preview, **not a deployed production bot**.
+Bilingual (Arabic/English) Telegram bot and Mini App foundation. Version **0.4** is a developer preview, **not a deployed production bot**.
 
 ## Available now
 - Telegram `/start` reply in Arabic or English.
@@ -12,7 +12,7 @@ Bilingual (Arabic/English) Telegram bot and Mini App foundation. Version **0.3**
 - **PDF Studio** — merge 2–5 PDFs in order or extract pages using ranges such as `1-3,5`; browser-only.
 - **Image Studio** — convert JPG/PNG/WebP, resize longest edge and adjust output quality; browser-only.
 - **Activity** — local operation history with timestamps and output sizes, never file contents or original names.
-- **Telegram reminders** — private-chat `/remind`, `/reminders`, `/cancel`, `/help`; SQLite persistence, retry and ownership protections. The Mini App shows command instructions; it does not schedule directly.
+- **Telegram reminders** — private-chat `/remind`, `/reminders`, `/cancel`, `/help` plus **Mini App create/list/cancel** backed by verified Telegram-signed initData on every request. SQLite persistence, safe retries and owner checks.
 - Client-side safety limits: 12MB/file, 36MB total PDFs, 200 resulting PDF pages, 24MP image input.
 - Bilingual labels (Arabic + English), RTL support.
 - FastAPI health endpoint `GET /api/v1/health`.
@@ -78,7 +78,7 @@ The Mini App and API are served together from FastAPI after `npm run build`. Clo
 ## Security and deployment
 - A real Mini App inside Telegram requires a **public HTTPS** URL. Use the temporary tunnel procedure for testing; permanent hosting comes later.
 - `initDataUnsafe` may supply UI hints but NEVER grants access. Server verifies `initData`.
-- No persistent authenticated API session exists in v0.1. Add secure sessions before private endpoints.
+- There is no long-lived API login session. v0.4 reminder operations require fresh Telegram-signed initData verified separately on every request. Other private endpoints must use equivalent authentication and ownership checks.
 - Keep secrets off GitHub, even if repository is private.
 - The public repository holds code and examples only; local database and `.env` are ignored.
 
@@ -115,7 +115,7 @@ Arabic works too: `/remind 10m اشتري خبز`.
 - Failed deliveries retry with backoff up to 5 total attempts.
 - Rare duplicate notifications are possible after a process crash between Telegram accepting the message and the database recording success. Exactly-once delivery is not guaranteed.
 - Messages are stored in plaintext in the local SQLite database; keep the Mac and backups protected.
-- The Mini App does not have authenticated reminder CRUD endpoints yet; use Bot commands only.
+- The Mini App now supports authenticated create/list/cancel through signed Telegram initData; the bot commands are still available.
 
 To test after downloading updates, start only the **bot process** if you don't need the Mini App:
 ```bash
@@ -126,3 +126,27 @@ source .venv/bin/activate
 python -m urukora.bot
 ```
 See `docs/REMINDERS.md` for operational details.
+
+## v0.4 — Reminders directly in the Mini App
+
+Open URUKORA from the **inline button under the bot's private chat message**. The Reminders card now supports:
+
+- Enter reminder text, choose quantity and minutes/hours/days, and create a reminder.
+- List upcoming reminders with their local displayed time, including reminders created using bot commands.
+- Cancel your own pending reminders.
+- Works in Arabic and English; unauthenticated browser preview cannot modify or read reminders.
+- Each API request verifies a fresh Telegram-signed `initData`; the launch data expires after **one hour**. Close and reopen the Mini App to obtain new data.
+- Requests include a random idempotency key to help prevent duplicate reminders if a response is lost.
+- Existing v0.3 SQLite data is preserved by an additive migration: a nullable `request_key` column and a unique index.
+
+**Security:** the signed `initData` is a temporary credential. Keep it out of URLs, logs, screenshots and analytics. Protect your tunnel URL and BotFather token. We do **not** use `initDataUnsafe` for authorization. Same-origin HTTPS is required for Mini App API access.
+
+**Run v0.4 on Mac after merging**:
+
+```bash
+cd ~/Documents/urukora
+git pull --ff-only
+cd miniapp && npm install && npm run test && npm run build
+```
+
+Restart FastAPI (port 8000), the bot process, and any expired Cloudflare tunnel, then tap a **new** inline Open URUKORA button. Test with `1m` and a harmless reminder. **The Mac must remain on and the bot process running for the reminder to arrive on time.**
