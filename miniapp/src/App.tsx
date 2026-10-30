@@ -4,7 +4,7 @@ import FileStudio, { type FileActivity } from './FileStudio';
 import { formatBytes } from './fileOps';
 
 type Lang = 'ar' | 'en';
-type Tab = 'home' | 'tools' | 'activity' | 'settings';
+type Tab = 'home' | 'tools' | 'activity' | 'settings' | 'reminders';
 type Tool = 'qr' | 'pdf' | 'images';
 type ActivityItem = FileActivity & { id: number; at: number };
 const HISTORY_KEY = 'urukora-local-activity-v2';
@@ -17,7 +17,12 @@ const translations = {
     settings: 'الإعدادات', qr: 'إنشاء QR', qrDesc: 'حوّل أي نص أو رابط إلى رمز QR.',
     pdf: 'استوديو PDF', pdfDesc: 'دمج الملفات واستخراج صفحاتها على جهازك.',
     images: 'استوديو الصور', imageDesc: 'تحويل الصور وتغيير حجمها وضغطها.',
-    reminders: 'التذكيرات', remindersDesc: 'تنظيم مهامك — قريباً',
+    reminders: 'التذكيرات', remindersDesc: 'سجّل تذكيراتك من محادثة البوت.',
+    reminderIntro: 'تگدر تنشئ وتلغي تذكيراتك من المحادثة الخاصة مع أوروكورا.',
+    reminderExample: 'مثال لإنشاء تذكير بعد 10 دقائق:',
+    reminderList: 'عرض التذكيرات المعلّقة:',
+    reminderCancel: 'إلغاء تذكير برقم معيّن:',
+    reminderNotice: 'حتى توصلك التذكيرات بوقتها لازم يكون البوت شغّال. إذا الماك مطفّي، تتأخر إلى أن ترجع تشغّله. الأوامر حالياً عبر المحادثة، مو الواجهة.',
     channels: 'إدارة القنوات', channelsDesc: 'جدولة المنشورات — قريباً',
     soon: 'قريباً', qrPlaceholder: 'اكتب نصاً أو رابطاً هنا...',
     generate: 'إنشاء الرمز', download: 'تنزيل PNG', qrRequired: 'اكتب نصاً أولاً.',
@@ -39,7 +44,12 @@ const translations = {
     settings: 'Settings', qr: 'QR generator', qrDesc: 'Turn any text or URL into a QR code.',
     pdf: 'PDF Studio', pdfDesc: 'Merge PDFs or extract pages privately.',
     images: 'Image Studio', imageDesc: 'Resize and convert your images.',
-    reminders: 'Reminders', remindersDesc: 'Organize your day — coming soon',
+    reminders: 'Reminders', remindersDesc: 'Create reminders from the bot chat.',
+    reminderIntro: 'Create, list and cancel your reminders in URUKORA’s private bot chat.',
+    reminderExample: 'Example: remind me in 10 minutes:',
+    reminderList: 'Show pending reminders:',
+    reminderCancel: 'Cancel a reminder by its ID:',
+    reminderNotice: 'The bot must be running for on-time delivery. If the Mac is off, delivery waits until restart. Commands work in the bot chat for now, not in this panel.',
     channels: 'Channel manager', channelsDesc: 'Schedule posts — coming soon',
     soon: 'Soon', qrPlaceholder: 'Type text or a URL...',
     generate: 'Generate QR', download: 'Download PNG', qrRequired: 'Enter text first.',
@@ -148,7 +158,7 @@ export default function App() {
     { id: 'pdf', icon: '▤', label: t.pdf, desc: t.pdfDesc, ready: true },
     { id: 'images', icon: '▧', label: t.images, desc: t.imageDesc, ready: true },
     { id: 'qr', icon: '▦', label: t.qr, desc: t.qrDesc, ready: true },
-    { id: 'reminders', icon: '◷', label: t.reminders, desc: t.remindersDesc, ready: false },
+    { id: 'reminders', icon: '◷', label: t.reminders, desc: t.remindersDesc, ready: true },
     { id: 'channels', icon: '◉', label: t.channels, desc: t.channelsDesc, ready: false },
   ];
   const nav: { id: Tab; label: string; icon: string }[] = [
@@ -177,7 +187,7 @@ export default function App() {
         </section>
         <h2>{t.services}</h2>
         <div className="service-grid">{services.map(s => <button type="button" key={s.id}
-          className="service" disabled={!s.ready} onClick={() => { if (s.ready) navigateTo(s.id as Tool); }}>
+          className="service" disabled={!s.ready} onClick={() => { if (s.id === 'reminders') setTab('reminders'); else if (s.ready) navigateTo(s.id as Tool); }}>
           <span className="service-icon">{s.icon}</span><strong>{s.label}</strong>
           <small>{s.desc}</small>{!s.ready && <em>{t.soon}</em>}
         </button>)}</div>
@@ -201,6 +211,20 @@ export default function App() {
         </section>}
         {(selectedTool === 'pdf' || selectedTool === 'images') &&
           <FileStudio lang={lang} tool={selectedTool} onComplete={addActivity}/>}
+      </>}
+      {tab === 'reminders' && <>
+        <h1 className="section-title">{t.reminders}</h1>
+        <section className="tool-card">
+          <div className="tool-heading"><span className="service-icon">◷</span><div><h2>{t.reminders}</h2><p>{t.reminderIntro}</p></div></div>
+          <p className="studio-hint">{t.reminderExample}</p>
+          <pre className="reminder-code" dir="ltr">/remind 10m {lang === 'ar' ? 'اشتري خبز' : 'Buy groceries'}</pre>
+          <p className="studio-hint">{t.reminderList}</p>
+          <pre className="reminder-code" dir="ltr">/reminders</pre>
+          <p className="studio-hint">{t.reminderCancel}</p>
+          <pre className="reminder-code" dir="ltr">/cancel 12</pre>
+          <p className="studio-hint">/help • m / h / d</p>
+          <p className="privacy">{t.reminderNotice}</p>
+        </section>
       </>}
       {tab === 'activity' && <>
         <h1 className="section-title">{t.activity}</h1>

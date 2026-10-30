@@ -6,9 +6,13 @@ from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, WebAppInfo
 from .config import settings
+from .db import initialize_db
+from .reminders import init_reminders
+from .reminder_bot import router as reminder_router, reminder_worker
 
 logger = logging.getLogger(__name__)
 dp = Dispatcher()
+dp.include_router(reminder_router)
 
 
 @dp.message(CommandStart())
@@ -59,10 +63,16 @@ async def run_bot() -> None:
     if not settings.bot_token:
         raise RuntimeError("BOT_TOKEN is missing. Set it in your local root .env")
     logging.basicConfig(level=logging.DEBUG if settings.debug else logging.INFO)
+    initialize_db()
+    init_reminders()
     bot = Bot(token=settings.bot_token)
+    task = asyncio.create_task(reminder_worker(bot))
     try:
         await dp.start_polling(bot)
     finally:
+        task.cancel()
+        with suppress(asyncio.CancelledError):
+            await task
         await bot.session.close()
 
 
